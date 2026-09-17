@@ -1,0 +1,16 @@
+# ESP-IDF
+build/
+managed_components/
+sdkconfig.old
+
+# ESP-IDF cache
+.cache/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# macOS
+.DS_Store
