@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "samples_checked": 100,
+  "max_xgboost_probability_absolute_error": 1.1878673078502544e-07,
+  "max_random_forest_probability_absolute_error": 3.3306690738754696e-16,
+  "tolerance": 1e-06,
+  "compiler": "cc",
+  "note": "Host compiler parity test; still compile and test on ESP-IDF target."
+}

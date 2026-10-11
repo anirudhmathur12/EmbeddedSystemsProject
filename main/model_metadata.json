@@ -1,0 +1,39 @@
+{
+  "warning": "Synthetic-data model; not validated for real milk.",
+  "feature_order": [
+    "pH",
+    "Temperature_C",
+    "Turbidity_NTU"
+  ],
+  "input_type": "double",
+  "expected_input_units": {
+    "pH": "pH sensor output",
+    "Temperature_C": "degrees Celsius",
+    "Turbidity_NTU": "nominal synthetic feature scale; not validated true NTU. Must be recalibrated against the actual sensor."
+  },
+  "stage1": {
+    "function": "milk_xgb_score",
+    "source": "milk_xgb.c",
+    "header": "milk_xgb.h",
+    "output": "two class probabilities/scores, class index 0=Normal, 1=Adulterated",
+    "adulterated_probability_index": 1,
+    "positive_threshold": 0.48818209767341614,
+    "model": "XGBoost binary classifier"
+  },
+  "stage2": {
+    "function": "milk_rf_score",
+    "source": "milk_rf.c",
+    "header": "milk_rf.h",
+    "output": "three class probabilities/scores in the order below",
+    "class_order": [
+      "Detergent",
+      "Starch",
+      "Water"
+    ],
+    "model": "Random Forest trained on adulterated samples only"
+  },
+  "versions": {
+    "xgboost": "3.4.1",
+    "scikit_learn": "1.9.0"
+  }
+}
