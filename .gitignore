@@ -1,16 +1,19 @@
-# ESP-IDF
-build/
-managed_components/
-sdkconfig.old
+# ESP-IDF build output
+/build/
+/sdkconfig
+/sdkconfig.old
 
-# ESP-IDF cache
-.cache/
+# ESP-IDF managed components (downloaded dependencies)
+/managed_components/
 
-# Python
+# Python cache
 __pycache__/
-*.pyc
-.venv/
-venv/
+*.py[cod]
 
-# macOS
-.DS_Store
+# Temporary and log files
+*.log
+*.tmp
+
+# ESP32 
+.cache
+main/build/
