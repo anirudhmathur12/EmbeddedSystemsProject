@@ -17,7 +17,7 @@
     "header": "milk_xgb.h",
     "output": "two class probabilities/scores, class index 0=Normal, 1=Adulterated",
     "adulterated_probability_index": 1,
-    "positive_threshold": 0.48818209767341614,
+    "positive_threshold": 0.46983906626701355,
     "model": "XGBoost binary classifier"
   },
   "stage2": {
