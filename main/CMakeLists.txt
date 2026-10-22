@@ -4,5 +4,6 @@ idf_component_register(
         "milk_model_runner.c"
         "milk_xgb.c"
         "milk_rf.c"
+        "sensor_rx.c"
     INCLUDE_DIRS "."
 )
