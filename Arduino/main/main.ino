@@ -30,9 +30,15 @@ static uint8_t calculate_checksum(const uint8_t* payload, size_t len) {
 }
 
 double temp(){
-  sensors.requestTemperatures();
+  double temp = 0;
+  double oldtemp = 100;
+  while(abs(temp - oldtemp)>0.01){}
+    oldtemp = temp;
+    sensors.requestTemperatures();
+    temp = sensors.getTempCByIndex(0);
+  }
+  return temp;
 
-  return sensors.getTempCByIndex(0);
 
 }
 
@@ -40,23 +46,30 @@ double turb(){
   long total = 0;
   const int samples = 20;
 
-  // Average several readings to reduce noise
-  for (int i = 0; i < samples; i++) {
-    total += analogRead(turbidityPin);
-    delay(10);
+  double turbidityValue = 0;
+  double oldturbidityValue = 5000;
+
+  while(abs(oldturbidityValue-turbidityValue)>0.01){
+    oldturbidityValue = turbidityValue;
+    // Average several readings to reduce noise
+    for (int i = 0; i < samples; i++) {
+      total += analogRead(turbidityPin);
+      delay(10);
+    }
+
+    double rawValue = total / (float)samples;
+    double voltage = rawValue * (5.0 / 1023.0);
+
+    turbidityValue = map(rawValue, 780, 0, 0, 5000);
   }
-
-  double rawValue = total / (float)samples;
-  double voltage = rawValue * (5.0 / 1023.0);
-
-  double turbidityValue = map(rawValue, 780, 0, 0, 5000);
-
   return turbidityValue;
 }
 
 double pH(){
   const int SensorPin = A0;
   const double VRef = 5.00;
+  double oldpH = 0.0;
+  double pH = 7.00;
 
   // Measured voltage in your pH 7.00 buffer
   const double V_pH7 = 2.5;
@@ -67,35 +80,38 @@ double pH(){
   int buf[10]; 
 
   // Take 10 samples
-  for (int i = 0; i < 10; i++) {
-    buf[i] = analogRead(SensorPin);
-    delay(10);
-  }
+  while(abs(oldpH - pH)>0.01){
+    oldpH = pH;
+    for (int i = 0; i < 10; i++) {
+      buf[i] = analogRead(SensorPin);
+      delay(10);
+    }
 
-  // Sort samples
-  for (int i = 0; i < 9; i++) {
-      for (int j = i + 1; j < 10; j++) {
-        if (buf[i] > buf[j]) {
-          int temp = buf[i];
-          buf[i] = buf[j];
-          buf[j] = temp;
+    // Sort samples
+    for (int i = 0; i < 9; i++) {
+        for (int j = i + 1; j < 10; j++) {
+          if (buf[i] > buf[j]) {
+            int temp = buf[i];
+            buf[i] = buf[j];
+            buf[j] = temp;
+          }
         }
       }
-    }
 
-    // Average the middle 6 samples
-    long totalADC = 0;
+      // Average the middle 6 samples
+      long totalADC = 0;
 
-    for (int i = 2; i < 8; i++) {
-      totalADC += buf[i];
-    }
+      for (int i = 2; i < 8; i++) {
+        totalADC += buf[i];
+      }
 
-    double avgADC = totalADC / 6.0;
-    double voltage = avgADC * VRef / 1023.0;
+      double avgADC = totalADC / 6.0;
+      double voltage = avgADC * VRef / 1023.0;
 
-    // Calibrate the offset using pH 7 buffer
-    double pH = 7.00 + (V_pH7 - voltage) / SLOPE;
-    pH += PH_OFFSET;
+      // Calibrate the offset using pH 7 buffer
+      pH = 7.00 + (V_pH7 - voltage) / SLOPE;
+      pH += PH_OFFSET;
+  }
 
     return pH;
 }
