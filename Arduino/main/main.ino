@@ -7,10 +7,27 @@ OneWire oneWire(ONE_WIRE_BUS);
 const int turbidityPin = A1;
 DallasTemperature sensors(&oneWire);
 
+
+typedef struct __attribute__((packed)) {
+  uint8_t header[2];
+  double ph;
+  double turbidity;
+  double temperature;
+  uint8_t checksum;
+} sensor_packet_t;
+
 // Create a software serial port on pins 9 (RX) and 10 (TX)
 // Connect Arduino Pin 9 to ESP32 TX
 // Connect Arduino Pin 10 to ESP32 RX
 SoftwareSerial mySerial(9, 10);
+
+static uint8_t calculate_checksum(const uint8_t* payload, size_t len) {
+    uint8_t xor_sum = 0;
+    for (size_t i = 0; i < len; i++) {
+        xor_sum ^= payload[i];
+    }
+    return xor_sum;
+}
 
 double temp(){
   sensors.requestTemperatures();
@@ -84,10 +101,10 @@ double pH(){
 }
 void setup() {
   // Start the USB Serial Monitor for debugging
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   // Start the Software Serial port for the ESP32
-  mySerial.begin(9600);
+  mySerial.begin(115200);
   sensors.begin();
   sensors.setResolution(12);
   pinMode(13, OUTPUT);
@@ -97,7 +114,30 @@ void setup() {
 
 void loop() {
   // Send data to the ESP32
-  mySerial.println("Hello from Apte!");
 
   delay(1000);  // Wait 1 second between messages
+
+  double _temp = temp();
+  double _pH = pH();
+  double _turb = turb();
+
+  sensor_packet_t _packet = (sensor_packet_t) {
+    .header = {0xAA, 0x55},
+    .ph = _pH,
+    .turbidity = _turb,
+    .temperature = _temp,
+    .checksum = 0,
+  };
+
+  uint8_t checksum = calculate_checksum((uint8_t *)(&_packet) + 2, 12);
+  _packet.checksum = checksum;
+
+  Serial.println(_pH);
+  Serial.println(_turb);
+  Serial.println(_temp);
+  Serial.println("cheeks");
+
+  mySerial.print("Hello from Apte");
+
+  mySerial.write((uint8_t *)&_packet, sizeof(sensor_packet_t));
 }

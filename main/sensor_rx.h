@@ -7,20 +7,20 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-// 15-byte packed
+// 15 bytes
 typedef struct __attribute__((packed)) {
     uint8_t header[2];  // Sync bytes: 0xAA, 0x55
-    double ph;          // 4 bytes
-    double turbidity;   // 4 bytes
-    double temperature; // 4 bytes
+    float ph;          // 4 bytes
+    float turbidity;   // 4 bytes
+    float temperature; // 4 bytes
     uint8_t checksum;   // 1 byte XOR checksum of the 12 float bytes
 } sensor_packet_t;
 
 // cleaned up data structure for in code use
 typedef struct {
-    double ph;
-    double turbidity;
-    double temperature;
+    float ph;
+    float turbidity;
+    float temperature;
 } sensor_data_t;
 
 esp_err_t sensor_rx_init(void);

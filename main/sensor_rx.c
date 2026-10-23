@@ -9,8 +9,8 @@
 
 #define SENSOR_UART_PORT UART_NUM_2
 #define SENSOR_UART_BAUD 115200
-#define SENSOR_RX_PIN GPIO_NUM_16
-#define SENSOR_TX_PIN GPIO_NUM_17
+#define SENSOR_RX_PIN GPIO_NUM_1
+#define SENSOR_TX_PIN GPIO_NUM_2
 #define RX_BUF_SIZE 256
 
 #define SYNC_BYTE_1 0xAA
@@ -61,7 +61,6 @@ bool sensor_rx_read(sensor_data_t* out_data, uint32_t timeout_ms) {
             if (byte == SYNC_BYTE_1) {
                 if (uart_read_bytes(SENSOR_UART_PORT, &byte, 1, pdMS_TO_TICKS(20)) == 1) {
                     if (byte == SYNC_BYTE_2) {
-                        // sync header found
                         uint8_t raw_payload[PAYLOAD_SIZE + 1];
                         int len = uart_read_bytes(SENSOR_UART_PORT, raw_payload,
                                                   sizeof(raw_payload), pdMS_TO_TICKS(100));
